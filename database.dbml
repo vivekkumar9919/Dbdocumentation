@@ -1,6 +1,6 @@
 Table "myschema"."customers" {
-  "customer_id" int4 [pk, not null, increment, note:"customer id"]
-  "name" varchar(255) [note:"customer name"]
+  "customer_id" int4 [pk, not null, increment]
+  "name" varchar(255)
   "email" varchar(255)
 }
 
@@ -15,6 +15,14 @@ Table "myschema"."orders" {
   "order_id" int4 [pk, not null, increment]
   "customer_id" int4
   "order_date" timestamp [default: `CURRENT_TIMESTAMP`]
+}
+
+Table "myschema"."payments" {
+  "payment_id" int4 [pk, not null, increment]
+  "customer_id" int4 [not null]
+  "amount" numeric(10,2) [not null]
+  "payment_date" timestamp [default: `CURRENT_TIMESTAMP`]
+  "status" varchar(50) [not null]
 }
 
 Table "myschema"."products" {
@@ -59,6 +67,8 @@ Ref "order_items_product_id_fkey":"products"."product_id" < "myschema"."order_it
 Ref "orders_customer_id_fkey":"myschema"."customers"."customer_id" < "myschema"."orders"."customer_id"
 
 Ref "orders_customer_id_fkey":"customers"."customer_id" < "myschema"."orders"."customer_id"
+
+Ref "payments_customer_id_fkey":"myschema"."customers"."customer_id" < "myschema"."payments"."customer_id" [delete: cascade]
 
 Ref "order_items_order_id_fkey":"myschema"."orders"."order_id" < "order_items"."order_id" [delete: cascade]
 

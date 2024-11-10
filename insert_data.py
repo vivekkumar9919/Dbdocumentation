@@ -3,13 +3,14 @@
 import psycopg2
 from db_connection import create_connection
 
-def insert_sample_data(customers, products, orders, order_items):
+def insert_sample_data(customers, products, orders, order_items, payments):
     """
     Inserts sample data into the customers, products, orders, and order_items tables.
     :param customers: List of tuples for each customer (name, email)
     :param products: List of tuples for each product (name, price)
     :param orders: List of tuples for each order (customer_id)
     :param order_items: List of tuples for each order item (order_id, product_id, quantity)
+    :param payments: List of tuples for each payment (customer_id, amount, status)
     """
     conn = create_connection()
     if conn is None:
@@ -51,12 +52,21 @@ def insert_sample_data(customers, products, orders, order_items):
                     "INSERT INTO myschema.order_items (order_id, product_id, quantity) VALUES (%s, %s, %s)",
                     item
                 )
+            # Insert payments
+            payment_ids = []
+            for payment in payments:
+                cursor.execute(
+                    "INSERT INTO myschema.payments (customer_id, amount, status) VALUES (%s, %s, %s) RETURNING payment_id",
+                    payment
+                )
+                payment_ids.append(cursor.fetchone()[0])  
 
             conn.commit()
             print("Sample data inserted successfully!")
             print("Customer IDs:", customer_ids)
             print("Product IDs:", product_ids)
             print("Order IDs:", order_ids)
+            print("Payment IDs:", payment_ids)
     except Exception as e:
         print("Failed to insert sample data:", e)
         conn.rollback()

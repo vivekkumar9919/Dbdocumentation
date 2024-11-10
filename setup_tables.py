@@ -50,6 +50,17 @@ def create_tables():
                 quantity INTEGER
             )
             """)
+            # SQL command to create the payments table if not already created
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS payments (
+                    payment_id SERIAL PRIMARY KEY,
+                    customer_id INTEGER NOT NULL,
+                    amount DECIMAL(10, 2) NOT NULL,
+                    payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    status VARCHAR(50) NOT NULL,
+                    FOREIGN KEY (customer_id) REFERENCES customers(customer_id) ON DELETE CASCADE
+                );
+            """)
 
             conn.commit()
             print("Tables created successfully.")
